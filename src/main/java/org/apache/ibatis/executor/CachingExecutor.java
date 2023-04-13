@@ -35,6 +35,8 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * @author Clinton Begin
  * @author Eduardo Macarron
+ * 二级缓存执行器：采用了装饰者模式
+ * 该模式在不改变原有类结构和继承的情况下，通过包装原对象去扩展一个新功能
  */
 public class CachingExecutor implements Executor {
 
@@ -94,6 +96,7 @@ public class CachingExecutor implements Executor {
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler,
       CacheKey key, BoundSql boundSql) throws SQLException {
     Cache cache = ms.getCache();
+    //查询是否存在二级缓存，如果存在二级缓存，首先到二级缓存中去找，找不到的话，再去包装执行器的一级缓存中去找
     if (cache != null) {
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
@@ -101,6 +104,7 @@ public class CachingExecutor implements Executor {
         @SuppressWarnings("unchecked")
         List<E> list = (List<E>) tcm.getObject(cache, key);
         if (list == null) {
+          //如果二级缓存中没有数据，交给包装执行器去获取数据，然后再放到二级缓存中去
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
           tcm.putObject(cache, key, list); // issue #578 and #116
         }

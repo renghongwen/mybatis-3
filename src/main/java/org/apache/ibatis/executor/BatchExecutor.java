@@ -37,6 +37,7 @@ import org.apache.ibatis.transaction.Transaction;
 
 /**
  * @author Jeff Butler
+ * 批执行器必须调用doFlushStatements方法刷新statement,进行提交,数据库数据才会更新
  */
 public class BatchExecutor extends BaseExecutor {
 

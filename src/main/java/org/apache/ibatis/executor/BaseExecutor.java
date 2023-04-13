@@ -46,6 +46,11 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * 一级缓存：sqlSession级别的缓存
+ * 二级缓存：mapper级别的缓存
+ * 还需要进一步探究的点:
+ * statement和preparedStatement
+ * simpleExecutor和ReuseExecutor
  */
 public abstract class BaseExecutor implements Executor {
 
@@ -155,6 +160,7 @@ public abstract class BaseExecutor implements Executor {
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+        //queryFromDatabase方法中调用了子类的doQuery方法
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
