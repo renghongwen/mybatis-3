@@ -156,6 +156,19 @@
   </properties>
 
   <dependencies>
+    <!--  集成mybatis-spring依赖   -->
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+    <!--  集成spring框架   -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring</artifactId>
+      <version>5.3.27</version>
+      <type>pom</type>
+    </dependency>
     <dependency>
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>

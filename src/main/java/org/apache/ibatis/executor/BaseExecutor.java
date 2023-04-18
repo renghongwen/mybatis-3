@@ -46,11 +46,25 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
- * 一级缓存：sqlSession级别的缓存
+ * 一级缓存：sqlSession级别的缓存.
  * 二级缓存：mapper级别的缓存
- * 还需要进一步探究的点:
- * statement和preparedStatement
- * simpleExecutor和ReuseExecutor
+ * 一级缓存命中的条件：
+ *      1.sqlSession必须一样
+ *      2.必须是相同的statementID，即mapper方法名，类和接口名一定要相同
+ *      3.sql和参数必须相同
+ *      4.RowBounds 返回行范围必须相同
+ * 执行sqlSession的commit或rollback方法时，会清空一级缓存
+ *
+ * 需要特别注意的点:
+ * statement和preparedStatement   preparedStatement是预编译的statement，多次执行相同语句时，只需要编译一次，而statement则是一个sql语句编译一次
+ * simpleExecutor和ReuseExecutor  simpleExecutor是简单的执行器，每来一个sql，到数据库中一次；
+ * ReuseExexutor则是可重用的执行器,对于相同的查询条件，不需要到数据库中重新查询
+ *
+ * sqlSession会话不是线程安全的
+ *
+ * spring集成mybatis后，查询时一级缓存失效，
+ * 是因为mapper每次都会构造一个新的会话(会话不同，所使用的执行器也就不同，一级缓冲的PerpetualCache对象也就不同，所以会导致一级缓存失效)
+ * 解决方案：手动开启事务,将多次查询放在一个事务当中
  */
 public abstract class BaseExecutor implements Executor {
 
@@ -166,6 +180,7 @@ public abstract class BaseExecutor implements Executor {
     } finally {
       queryStack--;
     }
+    //子查询依赖了一级缓存，所以不能清空
     if (queryStack == 0) {
       for (DeferredLoad deferredLoad : deferredLoads) {
         deferredLoad.load();
@@ -334,6 +349,7 @@ public abstract class BaseExecutor implements Executor {
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds,
       ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
+    //EXECUTION_PLACEHOLDER用于解决子查询中的循环依赖问题
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
