@@ -23,9 +23,11 @@ import org.apache.ibatis.util.MapUtil;
 
 /**
  * @author Clinton Begin
+ *  事务缓存管理器
  */
 public class TransactionalCacheManager {
 
+  // key : mapper名称空间    value  : 二级缓存区
   private final Map<Cache, TransactionalCache> transactionalCaches = new HashMap<>();
 
   public void clear(Cache cache) {

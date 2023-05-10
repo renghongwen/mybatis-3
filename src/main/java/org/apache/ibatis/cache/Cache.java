@@ -37,6 +37,8 @@ import java.util.concurrent.locks.ReadWriteLock;
  * </pre>
  *
  * @author Clinton Begin
+ *
+ * 二级缓存中使用到了装饰模式和责任链模式两种设计模式
  */
 
 public interface Cache {

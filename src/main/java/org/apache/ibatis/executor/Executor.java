@@ -12,6 +12,12 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ *
+ * SqlSession    Executor    StatementHandle
+ *     1    ---->   1   ----->  n
+ * 无论是否使用了PreparedStatement，Executor和StatementHandle都是1对n的关系;
+ * 如果走了缓存的话，就不会使用到StatementHandle
+ *
  */
 package org.apache.ibatis.executor;
 

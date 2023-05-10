@@ -37,6 +37,21 @@ import org.apache.ibatis.transaction.Transaction;
  * @author Eduardo Macarron
  * 二级缓存执行器：采用了装饰者模式
  * 该模式在不改变原有类结构和继承的情况下，通过包装原对象去扩展一个新功能
+ *
+ * 二级缓存又称为应用级缓存,它的作用范围是整个应用，而且可以跨线程使用。
+ * 二级缓存的命中率更高，适合缓存一些修改较少的数据
+ *
+ * 溢出淘汰机制：FIFO(先进先出)，LRU(最近最少使用)
+ *
+ * 二级缓存命中的条件：
+ * 1.会话提交后 (sqlSession设置了自动提交，二级缓存也不能命中，必须手动进行提交)
+ * 2.相同的statementID
+ * 3.相同的sql和参数
+ * 4.RowBounds 返回行范围必须相同
+ *
+ * 清空缓存，会清空该session中所有的缓存 (需测试进一步确认)
+ *  **所有对缓存的变更只有提交之后才能生效**
+ *  CachingExecutor的作用是拦截，为了后续走二级缓存查询的逻辑
  */
 public class CachingExecutor implements Executor {
 
@@ -149,11 +164,6 @@ public class CachingExecutor implements Executor {
   }
 
   @Override
-  public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
-    return delegate.createCacheKey(ms, parameterObject, rowBounds, boundSql);
-  }
-
-  @Override
   public boolean isCached(MappedStatement ms, CacheKey key) {
     return delegate.isCached(ms, key);
   }
@@ -165,6 +175,11 @@ public class CachingExecutor implements Executor {
   }
 
   @Override
+  public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
+    return delegate.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+  }
+
+  @Override
   public void clearLocalCache() {
     delegate.clearLocalCache();
   }
@@ -172,6 +187,7 @@ public class CachingExecutor implements Executor {
   private void flushCacheIfRequired(MappedStatement ms) {
     Cache cache = ms.getCache();
     if (cache != null && ms.isFlushCacheRequired()) {
+      //清空暂存区中的缓存数据
       tcm.clear(cache);
     }
   }

@@ -169,6 +169,19 @@
       <version>5.3.27</version>
       <type>pom</type>
     </dependency>
+    <!--测试依赖包-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+    <!--spring整合test-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>5.3.20</version>
+    </dependency>
     <dependency>
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
@@ -323,6 +336,11 @@
       <artifactId>mysql</artifactId>
       <version>1.18.0</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.2.16</version>
     </dependency>
     <!-- For javadoc link -->
     <dependency>
