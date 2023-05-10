@@ -25,13 +25,15 @@ import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.session.ResultHandler;
 
+
 /**
  * @author Clinton Begin
+ * StatementHandle：JDBC处理器，基于JDBC构建Statement并设置参数，然后执行sql，每调用会话当中的一次sql，都会有与之对应的且唯一的Statement实例
  */
 public interface StatementHandler {
 
   Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException;
-
+  //设置参数
   void parameterize(Statement statement) throws SQLException;
 
   void batch(Statement statement) throws SQLException;

@@ -81,6 +81,7 @@ public class ReuseExecutor extends BaseExecutor {
   }
 
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
+    //声明Statement
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
     String sql = boundSql.getSql();
@@ -89,6 +90,7 @@ public class ReuseExecutor extends BaseExecutor {
       applyTransactionTimeout(stmt);
     } else {
       Connection connection = getConnection(statementLog);
+      //创建Statement
       stmt = handler.prepare(connection, transaction.getTimeout());
       putStatement(sql, stmt);
     }
